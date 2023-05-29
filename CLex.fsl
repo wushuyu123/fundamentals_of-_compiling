@@ -21,7 +21,10 @@ let keyword s =
     | "else"    -> ELSE
     | "false"   -> CSTBOOL 0
     | "if"      -> IF
-    | "int"     -> INT
+    | "int"     -> failwith " 首字母要大写"
+    | "float"   -> failwith " 首字母要大写"
+    | "Int"     -> INT
+
     | "null"    -> NULL
     | "print"   -> PRINT
     | "println" -> PRINTLN
