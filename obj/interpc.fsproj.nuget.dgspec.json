@@ -1,26 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "D:\\编译原理\\plzoofs-master\\microc\\interpc.fsproj": {}
+    "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\interpc.fsproj": {}
   },
   "projects": {
-    "D:\\编译原理\\plzoofs-master\\microc\\interpc.fsproj": {
+    "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\interpc.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\编译原理\\plzoofs-master\\microc\\interpc.fsproj",
+        "projectUniqueName": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\interpc.fsproj",
         "projectName": "interpc",
-        "projectPath": "D:\\编译原理\\plzoofs-master\\microc\\interpc.fsproj",
-        "packagesPath": "C:\\Users\\83668\\.nuget\\packages\\",
-        "outputPath": "D:\\编译原理\\plzoofs-master\\microc\\obj\\",
+        "projectPath": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\interpc.fsproj",
+        "packagesPath": "C:\\Users\\wsy17\\.nuget\\packages\\",
+        "outputPath": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\83668\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\wsy17\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
-          "C:\\Program Files\\dotnet\\sdk\\6.0.407\\FSharp\\library-packs": {},
+          "C:\\Program Files\\dotnet\\sdk\\6.0.406\\FSharp\\library-packs": {},
           "https://nuget.cdn.azure.cn/v3/index.json": {}
         },
         "frameworks": {
@@ -62,7 +62,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.407\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -97,6 +97,7 @@ let rec emitx86 instr =
     | CSTI i ->
         $";CSTI {i}\n\t\
                     push {i}\n\t"
+
     | GVAR i ->
         $";GVAR {i}\n\t\
                     mov rax ,qword [glovars]\n\t\
