@@ -17,14 +17,14 @@ let lexemeAsString lexbuf =
 // keyword 处理关键字与标识符的辅助函数
 let keyword s =   
     match s with
-    | "char"    -> CHAR    // 返回对应的Token ,Token 定义于 CPar.fsl 文件中
+    | "Char"    -> CHAR    // 返回对应的Token ,Token 定义于 CPar.fsl 文件中
     | "else"    -> ELSE
     | "false"   -> CSTBOOL 0
     | "if"      -> IF
-    | "int"     -> failwith " 首字母要大写"
-    | "float"   -> failwith " 首字母要大写"
     | "Int"     -> INT
-
+    | "Float"   -> FLOAT
+    // | "int"     -> failwith "The first character needs to be capitalized....." 
+    // | "float"   -> failwith "The first character needs to be capitalized....." 
     | "null"    -> NULL
     | "print"   -> PRINT
     | "println" -> PRINTLN
@@ -61,13 +61,16 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
                             //  System.Int32.Parse 将 字符串转换为 int 类型
                             // 在 CPar 中  词元CSTINT 的语义值的类型是int  %token <int> CSTINT
                             //  CSTINT 需要一个整数作为参数
-
+  | ['0'-'9']+('.'['0'-'9']+) { CSTFLOAT (System.Single.Parse (lexemeAsString lexbuf)) }
+                            // System.Single.Parse 将 字符串转换为单精度浮点数，不能转双精度
   | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
                     { keyword (lexemeAsString lexbuf) } //标识符处理
                                                        //先查是否是关键字，是则返回对应关键字的Token
   | '+'             { PLUS }  // 返回Token PLUS 给调用词法分析器的程序，通常是Parser
-                              // 此时lexbuf是 匹配 '+'完成后，后续的内容 
+                              // 此时lexbuf是 匹配 '+'完成后，后续的内容
+  | "++"           { SELFPLUS }
   | '-'             { MINUS } 
+  | "--"           { SELFMINUS }
   | '*'             { TIMES } 
   | '/'             { DIV } 
   | '%'             { MOD }                     
@@ -95,7 +98,6 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
                                                              // 处理完后 lexbuf 内容已经更新，注释部分过滤
                                                              //调用 Token 规则函数继续注释部分后面的处理
   | "/*"            { Comment lexbuf; Token lexbuf }   // 多行注释，调用 Comment规则
-  | "(*"            { Comment lexbuf; Token lexbuf }    // 多行注释，调用Comment规则
   | '"'             { CSTSTRING (String [] lexbuf) }   // 调用字符串处理规则
   | eof             { EOF }
   | _               { failwith "Lexer error: illegal symbol" }
@@ -103,8 +105,6 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
 and Comment = parse
    | "/*"           { Comment lexbuf; Comment lexbuf }  // 注释的嵌套处理
    | "*/"           { () }                           // 注释处理结束
-   | "(*"           { Comment lexbuf; Comment lexbuf } // 注释的嵌套处理
-   | "*)"           { () }                           // 注释处理结束
    | '\n'           { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Comment lexbuf } //注释跨行处理
    | (eof | '\026') { failwith "Lexer error: unterminated comment" }  // 多行注释未封闭
    | _              { Comment lexbuf }  // 其他任意情况都继续处理后续字符
