@@ -19,7 +19,7 @@ let nl = CstI 10 //  \n 的 ASCII 码
 %token <float32> CSTFLOAT
 
 
-%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE FLOAT
+%token CHAR ELSE IF INT FLOAT NULL PRINT PRINTLN RETURN VOID WHILE
 %token PLUS MINUS TIMES DIV MOD SELFPLUS SELFMINUS
 %token EQ NE GT LT GE LE
 %token NOT SEQOR SEQAND
@@ -160,6 +160,7 @@ ExprNotAccess:
   | Access ASSIGN Expr                  { Assign($1, $3)      } // $1为左值
   | NAME LPAR Exprs RPAR                { Call($1, $3)        }  
   | NOT Expr                            { Prim1("!", $2)      }
+  | PRINT Expr                          { Prim1("printfs", $2) }
   | PRINT Expr                          { Prim1("printi", $2) }
   | PRINTLN                             { Prim1("printc", nl) }
   | Expr PLUS  Expr                     { Prim2("+",  $1, $3) }
@@ -179,6 +180,7 @@ ExprNotAccess:
   | Expr LE    Expr                     { Prim2("<=", $1, $3) }
   | Expr SEQAND Expr                    { Andalso($1, $3)     }
   | Expr SEQOR  Expr                    { Orelse($1, $3)      }
+  | PRINT LPAR CSTSTRING COMMA Expr RPAR{ Print($3, $5)       } //LPAR左括号 RPAR右括号 COMMA逗号
 ;
 
 AtExprNotAccess:
@@ -187,7 +189,7 @@ AtExprNotAccess:
     // AMP Access  , &x
     // (3)   
     Const                               { CstI $1             }
-  | ConstFloat                          { CstF $1             }
+  | ConstFloat                          { CstF ($1)           }
   | LPAR ExprNotAccess RPAR             { $2                  } 
   | AMP Access                          { Addr $2             } // 取地址
 ;
@@ -216,6 +218,7 @@ Const:
   | MINUS CSTINT                        { - $2     }
   | NULL                                { -1       }
 ;
+
 ConstFloat:
     CSTFLOAT                            { $1       }
   | MINUS CSTFLOAT                      { - $2     }
@@ -223,5 +226,5 @@ ConstFloat:
 Type:
     INT                                 { TypI     }
   | CHAR                                { TypC     }
-  | FLOAT                               {TypF      }
+  | FLOAT                               { TypF     }
 ;

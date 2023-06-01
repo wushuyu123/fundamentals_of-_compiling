@@ -307,7 +307,6 @@ and eval e locEnv gloEnv store : int * store =
         (res, setSto store2 loc res)
     | CstI i -> (i, store)
     | CstF i -> (System.BitConverter.ToInt32(System.BitConverter.GetBytes(i), 0), store)
-
     | Addr acc -> access acc locEnv gloEnv store
     | Prim1 (ope, e1) ->
         let (i1, store1) = eval e1 locEnv gloEnv store
@@ -320,6 +319,9 @@ and eval e locEnv gloEnv store : int * store =
                  i1)
             | "printc" ->
                 (printf "%c" (char i1)
+                 i1)
+            | "printfs" ->
+                (printf "%f" (System.BitConverter.ToSingle(System.BitConverter.GetBytes(i1),0))
                  i1)
             | _ -> failwith ("unknown primitive " + ope)
 
@@ -344,6 +346,15 @@ and eval e locEnv gloEnv store : int * store =
             | _ -> failwith ("unknown primitive " + ope)
 
         (res, store2)
+    | Print(op,e1)  ->  let (i1, store1) = eval e1 locEnv gloEnv store
+                        let res = 
+                          match op with
+                          | "%c"  -> (printf "%c " (System.BitConverter.ToChar(System.BitConverter.GetBytes(i1),0)); i1)
+                          | "%d"  -> (printf "%d " i1 ; i1) 
+                          | "%f"  -> (printf "%f " (System.BitConverter.ToSingle(System.BitConverter.GetBytes(i1),0)) ;i1)
+                          | "%s"  -> (printf "%s " (string i1) ;i1 )
+                        (res, store1) 
+
     | Andalso (e1, e2) ->
         let (i1, store1) as res = eval e1 locEnv gloEnv store
 
