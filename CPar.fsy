@@ -179,6 +179,7 @@ ExprNotAccess:
   | Expr LE    Expr                     { Prim2("<=", $1, $3) }
   | Expr SEQAND Expr                    { Andalso($1, $3)     }
   | Expr SEQOR  Expr                    { Orelse($1, $3)      }
+  | PRINT LPAR CSTSTRING COMMA Expr RPAR{ Print($3, $5)       } //LPAR左括号 RPAR右括号 COMMA逗号
 ;
 
 AtExprNotAccess:
