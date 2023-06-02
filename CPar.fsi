@@ -32,13 +32,13 @@ type token =
   | ELSE
   | IF
   | INT
-  | FLOAT
   | NULL
   | PRINT
   | PRINTLN
   | RETURN
   | VOID
   | WHILE
+  | FLOAT
   | CSTFLOAT of (float32)
   | CSTSTRING of (string)
   | NAME of (string)
@@ -76,13 +76,13 @@ type tokenId =
     | TOKEN_ELSE
     | TOKEN_IF
     | TOKEN_INT
-    | TOKEN_FLOAT
     | TOKEN_NULL
     | TOKEN_PRINT
     | TOKEN_PRINTLN
     | TOKEN_RETURN
     | TOKEN_VOID
     | TOKEN_WHILE
+    | TOKEN_FLOAT
     | TOKEN_CSTFLOAT
     | TOKEN_CSTSTRING
     | TOKEN_NAME

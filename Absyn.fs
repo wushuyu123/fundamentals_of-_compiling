@@ -28,8 +28,8 @@ and expr =                           // 表达式，右值
   | Andalso of expr * expr           (* Sequential and              *)
   | Orelse of expr * expr            (* Sequential or               *)
   | Call of string * expr list       (* Function call f(...)        *)
-  | SelfOperation of string * access               
-  | Print of string * expr           (* Print *)                                                  
+  | SelfOperation of string * access     
+
 and access =                         //左值，存储的位置                                            
   | AccVar of string                 (* Variable access        x    *) 
   | AccDeref of expr                 (* Pointer dereferencing  *p   *)
