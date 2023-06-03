@@ -68,6 +68,7 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
                                                        //先查是否是关键字，是则返回对应关键字的Token
   | '+'             { PLUS }  // 返回Token PLUS 给调用词法分析器的程序，通常是Parser
                               // 此时lexbuf是 匹配 '+'完成后，后续的内容
+  | "+="            { ADDOPE }
   | "++"            { SELFPLUS }
   | '-'             { MINUS } 
   | "--"            { SELFMINUS }
@@ -101,10 +102,13 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
   | '"'             { CSTSTRING (String [] lexbuf) }   // 调用字符串处理规则
   | eof             { EOF }
   | _               { failwith "Lexer error: illegal symbol" }
+  | "(*"            { Comment lexbuf; Token lexbuf }
 
 and Comment = parse
    | "/*"           { Comment lexbuf; Comment lexbuf }  // 注释的嵌套处理
    | "*/"           { () }                           // 注释处理结束
+   | "(*"           { Comment lexbuf; Comment lexbuf }  // 注释的嵌套处理
+   | "*)"           { () } 
    | '\n'           { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Comment lexbuf } //注释跨行处理
    | (eof | '\026') { failwith "Lexer error: unterminated comment" }  // 多行注释未封闭
    | _              { Comment lexbuf }  // 其他任意情况都继续处理后续字符
