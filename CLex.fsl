@@ -7,6 +7,12 @@
   
 open FSharp.Text.Lexing
 open CPar  // Token 的定义位于语法分析模块中
+open System.Text.RegularExpressions // 引入正则模块
+
+let (|Regex|_|) pattern input =
+        let m = Regex.Match(input, pattern)
+        if m.Success then Some(List.tail [ for g in m.Groups -> g.Value ])
+        else None
 
 // 辅助函数，从lexbuf 得到当前的 词元字符串，lexeme 
 let lexemeAsString lexbuf = 
@@ -31,7 +37,9 @@ let keyword s =
     | "return"  -> RETURN
     | "true"    -> CSTBOOL 1
     | "void"    -> VOID 
-    | "while"   -> WHILE         
+    | "while"   -> WHILE      
+    | Regex @"(^[A-Z])" [ x ] -> failwith "变量首字母不应该为大写" 
+    | Regex @"(^[__])" [ x ] -> failwith "变量不能以__开头" 
     | _         -> NAME s   // 缺省情况，是标识符的名字，如 函数名，变量名等
                             // 当所有的关键字没有匹配成功时，则当成标识符
 // 字符串转义符处理函数
@@ -68,7 +76,6 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
                                                        //先查是否是关键字，是则返回对应关键字的Token
   | '+'             { PLUS }  // 返回Token PLUS 给调用词法分析器的程序，通常是Parser
                               // 此时lexbuf是 匹配 '+'完成后，后续的内容
-  | "+="            { ADDOPE }
   | "++"            { SELFPLUS }
   | '-'             { MINUS } 
   | "--"            { SELFMINUS }
@@ -102,13 +109,10 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
   | '"'             { CSTSTRING (String [] lexbuf) }   // 调用字符串处理规则
   | eof             { EOF }
   | _               { failwith "Lexer error: illegal symbol" }
-  | "(*"            { Comment lexbuf; Token lexbuf }
 
 and Comment = parse
    | "/*"           { Comment lexbuf; Comment lexbuf }  // 注释的嵌套处理
    | "*/"           { () }                           // 注释处理结束
-   | "(*"           { Comment lexbuf; Comment lexbuf }  // 注释的嵌套处理
-   | "*)"           { () } 
    | '\n'           { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Comment lexbuf } //注释跨行处理
    | (eof | '\026') { failwith "Lexer error: unterminated comment" }  // 多行注释未封闭
    | _              { Comment lexbuf }  // 其他任意情况都继续处理后续字符

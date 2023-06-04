@@ -28,7 +28,6 @@ type token =
   | MOD
   | SELFPLUS
   | SELFMINUS
-  | ADDOPE
   | CHAR
   | ELSE
   | IF
@@ -73,7 +72,6 @@ type tokenId =
     | TOKEN_MOD
     | TOKEN_SELFPLUS
     | TOKEN_SELFMINUS
-    | TOKEN_ADDOPE
     | TOKEN_CHAR
     | TOKEN_ELSE
     | TOKEN_IF
