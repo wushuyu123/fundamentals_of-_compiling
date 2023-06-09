@@ -27,10 +27,10 @@ let keyword s =
     | "else"    -> ELSE
     | "false"   -> CSTBOOL 0
     | "if"      -> IF
+    | "for"     -> FOR
+    | "in"      -> IN
+    | "range"   -> RANGE
     | "Int"     -> INT
-    | "switch"  -> SWITCH
-    | "case"    -> CASE
-    | "default" -> DEFAULT 
     | "Float"   -> FLOAT
     | "int"     -> failwith "首字母应该小写" 
     | "float"   -> failwith "首字母应该小写" 
@@ -40,7 +40,7 @@ let keyword s =
     | "return"  -> RETURN
     | "true"    -> CSTBOOL 1
     | "void"    -> VOID 
-    | "while"   -> WHILE     
+    | "while"   -> WHILE      
     | Regex @"(^[A-Z])" [ x ] -> failwith "变量首字母不应该为大写" 
     | Regex @"(^[__])" [ x ] -> failwith "变量不能以__开头" 
     | _         -> NAME s   // 缺省情况，是标识符的名字，如 函数名，变量名等
@@ -79,7 +79,14 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
                                                        //先查是否是关键字，是则返回对应关键字的Token
   | '+'             { PLUS }  // 返回Token PLUS 给调用词法分析器的程序，通常是Parser
                               // 此时lexbuf是 匹配 '+'完成后，后续的内容
+  | "+="            { ADDOPE }
+  | "-="            { MINUSOPE } 
+  | "*="            { TIMESOPE }
+  | "/="            { DIVOPE }      
+  | "%="            { MODOPE }  
   | "++"            { SELFPLUS }
+  | '?'             { QUEM }
+  | ':'             { COLON }
   | '-'             { MINUS } 
   | "--"            { SELFMINUS }
   | '*'             { TIMES } 

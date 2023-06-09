@@ -269,21 +269,6 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
                 store2 //退出循环返回 环境store2
 
         loop store
-    
-    | Switch(e,body) ->  
-              let (res, store1) = eval e locEnv gloEnv  store
-              let rec choose list =
-                match list with
-                | Case(e1,body1) :: tail -> 
-                    let (res2, store2) = eval e1 locEnv gloEnv  store1
-                    if res2=res then exec body1 locEnv gloEnv  store2
-                                else choose tail
-                | [] -> store1
-                | Default( body1 ) :: tail -> 
-                    exec body1 locEnv gloEnv  store1
-                    choose tail
-              (choose body)
-    | Case(e,body) -> exec body locEnv gloEnv  store
 
     | Expr e ->
         // _ 表示丢弃e的值,返回 变更后的环境store1
@@ -302,9 +287,46 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
 
         loop stmts (locEnv, store)
 
-
-
     | Return _ -> failwith "return not implemented" // 解释器没有实现 return
+
+    | For (e1, e2, e3, body) ->
+        let (v, store1) = eval e1 locEnv gloEnv store
+        let rec loop store1 = 
+            let (v, store2) = eval e2 locEnv gloEnv store1
+            if v<>0 then
+                // 执行内部 语句
+                let store3 = exec body locEnv gloEnv store2
+                // i++
+                let (tmp, store4) = eval e3 locEnv gloEnv store3
+                loop store4
+            else store2
+        loop store1
+    | ForRangeOne (e1, e2, body) ->
+        let (max,store) = eval e2 locEnv gloEnv store
+        let (loc, store1) = access e1 locEnv gloEnv store
+        // 赋初值
+        let store2 = setSto store1 loc 0
+        let rec loop store2 = 
+            let i = getSto store2 loc
+            if i<max then
+                let store3 = exec body locEnv gloEnv store2
+                let store4 = setSto store3 loc (i+1)
+                loop store4
+            else store2
+        loop store2
+    | ForRangeTwo (e1, e2, e3, body) ->
+        let (start,store) = eval e2 locEnv gloEnv store
+        let (last,store) = eval e3 locEnv gloEnv store
+        let (loc, store1) = access e1 locEnv gloEnv store
+        let store2 = setSto store1 loc start
+        let rec loop store2 = 
+            let i = getSto store2 loc
+            if i<last then
+                let store3 = exec body locEnv gloEnv store2
+                let store4 = setSto store3 loc (i+1)
+                loop store4
+            else store2
+        loop store2
 
 and stmtordec stmtordec locEnv gloEnv store =
     match stmtordec with
@@ -324,6 +346,7 @@ and eval e locEnv gloEnv store : int * store =
         (res, setSto store2 loc res)
     | CstI i -> (i, store)
     | CstF i -> (System.BitConverter.ToInt32(System.BitConverter.GetBytes(i), 0), store)
+
     | Addr acc -> access acc locEnv gloEnv store
     | Prim1 (ope, e1) ->
         let (i1, store1) = eval e1 locEnv gloEnv store
@@ -360,15 +383,14 @@ and eval e locEnv gloEnv store : int * store =
             | _ -> failwith ("unknown primitive " + ope)
 
         (res, store2)
-    | Print(op,e1)  ->  let (i1, store1) = eval e1 locEnv gloEnv store
-                        let res = 
-                          match op with
-                          | "%c"  -> (printf "%c " (System.BitConverter.ToChar(System.BitConverter.GetBytes(i1),0)); i1)
-                          | "%d"  -> (printf "%d " i1 ; i1) 
-                          | "%f"  -> (printf "%f " (System.BitConverter.ToSingle(System.BitConverter.GetBytes(i1),0)) ;i1)
-                          | "%s"  -> (printf "%s " (string i1) ;i1 )
-                        (res, store1) 
-
+    | Prim3(e1,e2,e3) ->
+        let (v1,store1) = eval e1 locEnv gloEnv store
+        let (v2,store2) = eval e2 locEnv gloEnv store1
+        let (v3,store3) = eval e3 locEnv gloEnv store2
+        if v1<> 0 then
+            (v2,store2)
+        else
+            (v3,store3)
     | Andalso (e1, e2) ->
         let (i1, store1) as res = eval e1 locEnv gloEnv store
 
@@ -384,25 +406,30 @@ and eval e locEnv gloEnv store : int * store =
         else
             eval e2 locEnv gloEnv store1
     | Call (f, es) -> callfun f es locEnv gloEnv store
+    // ++I --I操作直接进行 + -1 再进行后续运算
+    // I++ I--操作先进行其他运算，再+ -1
     | SelfOperation (msg,acc) ->
-        match msg with
+        match msg with   
         | "I++" -> 
             let (loc, store1) = access acc locEnv gloEnv store
+            let pre = getSto store1 loc
             let res = getSto store1 loc + 1
-            (res, setSto store1 loc res)
+            (pre, setSto store1 loc res)
         | "++I" -> 
             let (loc, store1) = access acc locEnv gloEnv store
             let res = getSto store1 loc + 1
             (res, setSto store1 loc res)
         | "I--" ->
             let (loc, store1) = access acc locEnv gloEnv store
+            let pre = getSto store1 loc
             let res = getSto store1 loc - 1
-            (res, setSto store1 loc res)
+            (pre, setSto store1 loc res)
         | "--I" ->
             let (loc, store1) = access acc locEnv gloEnv store
             let res = getSto store1 loc - 1
             (res, setSto store1 loc res)
         | _ -> failwith ("err for SelfOperation")
+    // += -= *= /= %=
     | ComplexOperation(ope,acc,e) ->
         // x += 2
         let  (loc, store1) = access acc locEnv gloEnv store // 取x地址

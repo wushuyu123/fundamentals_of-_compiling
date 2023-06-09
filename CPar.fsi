@@ -43,10 +43,12 @@ type token =
   | RETURN
   | VOID
   | WHILE
-  | SWITCH
-  | CASE
-  | DEFAULT
   | FLOAT
+  | FOR
+  | IN
+  | RANGE
+  | QUEM
+  | COLON
   | CSTFLOAT of (float32)
   | CSTSTRING of (string)
   | NAME of (string)
@@ -95,10 +97,12 @@ type tokenId =
     | TOKEN_RETURN
     | TOKEN_VOID
     | TOKEN_WHILE
-    | TOKEN_SWITCH
-    | TOKEN_CASE
-    | TOKEN_DEFAULT
     | TOKEN_FLOAT
+    | TOKEN_FOR
+    | TOKEN_IN
+    | TOKEN_RANGE
+    | TOKEN_QUEM
+    | TOKEN_COLON
     | TOKEN_CSTFLOAT
     | TOKEN_CSTSTRING
     | TOKEN_NAME

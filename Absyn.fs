@@ -28,9 +28,9 @@ and expr =                           // 表达式，右值
   | Andalso of expr * expr           (* Sequential and              *)
   | Orelse of expr * expr            (* Sequential or               *)
   | Call of string * expr list       (* Function call f(...)        *)
-  | SelfOperation of string * access  
-  | Print of string * expr           (* Print *)
+  | SelfOperation of string * access     
   | ComplexOperation of string * access * expr
+  | Prim3 of expr * expr * expr
 
 and access =                         //左值，存储的位置                                            
   | AccVar of string                 (* Variable access        x    *) 
@@ -40,12 +40,14 @@ and access =                         //左值，存储的位置
 and stmt =                                                         
   | If of expr * stmt * stmt         (* Conditional                 *)
   | While of expr * stmt             (* While loop                  *)
-  | Switch of expr * stmt list       (* switch-case                 *)  //switch-case条件分支 
-  | Case of expr * stmt 
-  | Default of stmt 
+  
   | Expr of expr                     (* Expression statement   e;   *)
   | Return of expr option            (* Return from method          *)
   | Block of stmtordec list          (* Block: grouping and scope   *)
+
+  | For of expr * expr * expr * stmt  
+  | ForRangeOne of access * expr * stmt
+  | ForRangeTwo of access * expr * expr * stmt
   // 语句块内部，可以是变量声明 或语句的列表                                                              
 
 and stmtordec =                                                    
