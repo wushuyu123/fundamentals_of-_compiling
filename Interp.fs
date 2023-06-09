@@ -269,6 +269,21 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
                 store2 //退出循环返回 环境store2
 
         loop store
+    
+    | Switch(e,body) ->  
+              let (res, store1) = eval e locEnv gloEnv  store
+              let rec choose list =
+                match list with
+                | Case(e1,body1) :: tail -> 
+                    let (res2, store2) = eval e1 locEnv gloEnv  store1
+                    if res2=res then exec body1 locEnv gloEnv  store2
+                                else choose tail
+                | [] -> store1
+                | Default( body1 ) :: tail -> 
+                    exec body1 locEnv gloEnv  store1
+                    choose tail
+              (choose body)
+    | Case(e,body) -> exec body locEnv gloEnv  store
 
     | Expr e ->
         // _ 表示丢弃e的值,返回 变更后的环境store1
@@ -286,6 +301,8 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
             | s1 :: sr -> loop sr (stmtordec s1 locEnv gloEnv store)
 
         loop stmts (locEnv, store)
+
+
 
     | Return _ -> failwith "return not implemented" // 解释器没有实现 return
 

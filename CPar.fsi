@@ -43,6 +43,9 @@ type token =
   | RETURN
   | VOID
   | WHILE
+  | SWITCH
+  | CASE
+  | DEFAULT
   | FLOAT
   | CSTFLOAT of (float32)
   | CSTSTRING of (string)
@@ -92,6 +95,9 @@ type tokenId =
     | TOKEN_RETURN
     | TOKEN_VOID
     | TOKEN_WHILE
+    | TOKEN_SWITCH
+    | TOKEN_CASE
+    | TOKEN_DEFAULT
     | TOKEN_FLOAT
     | TOKEN_CSTFLOAT
     | TOKEN_CSTSTRING

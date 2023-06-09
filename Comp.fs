@@ -186,6 +186,25 @@ let rec cStmt stmt (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
         @ cStmt body varEnv funEnv
           @ [ Label labtest ]
             @ cExpr e varEnv funEnv @ [ IFNZRO labbegin ]
+    | Switch (e, stmt1) ->                               
+        let rec cases stmt1 =                            
+            match stmt1 with
+            | Case(e2, stmt2) :: stmts -> 
+                let labend = newLabel () 
+                let labnext = newLabel () 
+                [ DUP ]                                 
+                @cExpr e2 varEnv funEnv lablist           //编译case表达式
+                  @ [ EQ ]                                         //判断switch匹配值和case是否相同
+                    @ [ IFZERO labend ]                             //不相等跳转end
+                      @ cStmt stmt2 varEnv funEnv lablist   //编译case后的执行语句
+                        @ [ GOTO labnext; Label labend ]          
+                          @ cases stmts                             //编译剩下的case
+                            @ [ Label labnext ]
+            | _ -> []                                               //匹配失败
+
+        cExpr e varEnv funEnv lablist                       //编译switch表达式
+        @ cases stmt1
+          @ [ INCSP -1 ]
     | Expr e -> cExpr e varEnv funEnv @ [ INCSP -1 ]
     | Block stmts ->
 
