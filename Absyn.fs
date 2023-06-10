@@ -32,6 +32,7 @@ and expr =                           // 表达式，右值
   | ComplexOperation of string * access * expr
   | Prim3 of expr * expr * expr
 
+
 and access =                         //左值，存储的位置                                            
   | AccVar of string                 (* Variable access        x    *) 
   | AccDeref of expr                 (* Pointer dereferencing  *p   *)
@@ -44,7 +45,7 @@ and stmt =
   | Expr of expr                     (* Expression statement   e;   *)
   | Return of expr option            (* Return from method          *)
   | Block of stmtordec list          (* Block: grouping and scope   *)
-
+  | DoWhile of stmt * expr
   | For of expr * expr * expr * stmt  
   | ForRangeOne of access * expr * stmt
   | ForRangeTwo of access * expr * expr * stmt
