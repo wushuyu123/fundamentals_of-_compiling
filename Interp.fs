@@ -347,6 +347,7 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
                 loop store4
             else store2
         loop store2
+    
     | DoWhile (body, e) ->
         // 先执行一次DO
         let store1 = exec body locEnv gloEnv store 
