@@ -1,25 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\plzoofs\\microc\\microc.fsproj": {}
+    "D:\\编译原理\\plzoofs-master\\microc\\microc.fsproj": {}
   },
   "projects": {
-    "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\plzoofs\\microc\\microc.fsproj": {
+    "D:\\编译原理\\plzoofs-master\\microc\\microc.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\plzoofs\\microc\\microc.fsproj",
+        "projectUniqueName": "D:\\编译原理\\plzoofs-master\\microc\\microc.fsproj",
         "projectName": "microc",
-        "projectPath": "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\plzoofs\\microc\\microc.fsproj",
-        "packagesPath": "C:\\Users\\ximo\\.nuget\\packages\\",
-        "outputPath": "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\plzoofs\\microc\\obj\\",
+        "projectPath": "D:\\编译原理\\plzoofs-master\\microc\\microc.fsproj",
+        "packagesPath": "C:\\Users\\83668\\.nuget\\packages\\",
+        "outputPath": "D:\\编译原理\\plzoofs-master\\microc\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\ximo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\83668\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files\\dotnet\\sdk\\6.0.407\\FSharp\\library-packs": {},
           "https://nuget.cdn.azure.cn/v3/index.json": {}
         },
         "frameworks": {
@@ -36,7 +37,7 @@
             "FSharp.Core": {
               "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
               "target": "Package",
-              "version": "[6.0.2, )",
+              "version": "[6.0.7, )",
               "generatePathProperty": true
             },
             "FsLexYacc": {
@@ -51,7 +52,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -60,7 +62,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.407\\RuntimeIdentifierGraph.json"
         }
       }
     }

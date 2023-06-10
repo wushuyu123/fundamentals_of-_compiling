@@ -149,7 +149,7 @@ let makeGlobalEnvs (topdecs: topdec list) : VarEnv * FunEnv * instr list =
     addv topdecs ([], 0) []
 
 
-(*
+(*+
     生成 x86 代码，局部地址偏移 *8 ，因为 x86栈上 8个字节表示一个 堆栈的 slot槽位
     栈式虚拟机 无须考虑，每个栈位保存一个变量
 *)
@@ -186,25 +186,6 @@ let rec cStmt stmt (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
         @ cStmt body varEnv funEnv
           @ [ Label labtest ]
             @ cExpr e varEnv funEnv @ [ IFNZRO labbegin ]
-    | Switch (e, stmt1) ->                               
-        let rec cases stmt1 =                            
-            match stmt1 with
-            | Case(e2, stmt2) :: stmts -> 
-                let labend = newLabel () 
-                let labnext = newLabel () 
-                [ DUP ]                                 
-                @cExpr e2 varEnv funEnv lablist           //编译case表达式
-                  @ [ EQ ]                                         //判断switch匹配值和case是否相同
-                    @ [ IFZERO labend ]                             //不相等跳转end
-                      @ cStmt stmt2 varEnv funEnv lablist   //编译case后的执行语句
-                        @ [ GOTO labnext; Label labend ]          
-                          @ cases stmts                             //编译剩下的case
-                            @ [ Label labnext ]
-            | _ -> []                                               //匹配失败
-
-        cExpr e varEnv funEnv lablist                       //编译switch表达式
-        @ cases stmt1
-          @ [ INCSP -1 ]
     | Expr e -> cExpr e varEnv funEnv @ [ INCSP -1 ]
     | Block stmts ->
 
@@ -296,7 +277,20 @@ and cExpr (e: expr) (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
                 CSTI 1
                 Label labend ]
     | Call (f, es) -> callfun f es varEnv funEnv
-
+// 编译器增加++--的功能（未完成前无法成功对.c文件编译）
+    | SelfOperation (ope,acc) ->
+            match ope with
+            // ++I --I 直接对I的地址的值进行操作
+            // 地址   2  ACE 8  DUP 9  LDI 9   ADD 9  STI 2
+            // 值     5      2      2      5       6      6
+            | "++I" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @ [CSTI 1] @ [ADD] @ [STI]
+            | "--I" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @ [CSTI 1] @ [SUB] @ [STI]
+            // I++ I-- 需要拷贝一份I的值，再对I的地址的值进行操作 
+            // 地址   2  ACE 8 DUP 9  LDI 9  SWAP 8 9  DUP 10 LDI 10 ADD 10 STI 2(10)  INCSP(-1) 去掉9留8
+            // 值     5      2     2      5       5 2      2      5      6      6
+            | "I++" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @[SWAP] @ [DUP] @[LDI] @[CSTI 1] @[ADD] @ [STI] @ [ INCSP(-1) ]
+            | "I--" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @[SWAP] @ [DUP]  @[LDI] @[CSTI 1] @[SUB] @ [STI] @ [ INCSP(-1) ]    
+            | _ -> failwith("unknown primitive " + ope)
 (* Generate code to access variable, dereference pointer or index array.
    The effect of the compiled code is to leave an lvalue on the stack.   *)
 

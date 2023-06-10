@@ -238,9 +238,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\编译原理\\plzoofs-master\\microc\\interpc.fsproj",
-      "projectName": "interpc",
-      "projectPath": "D:\\编译原理\\plzoofs-master\\microc\\interpc.fsproj",
+      "projectUniqueName": "D:\\编译原理\\plzoofs-master\\microc\\microc.fsproj",
+      "projectName": "microc",
+      "projectPath": "D:\\编译原理\\plzoofs-master\\microc\\microc.fsproj",
       "packagesPath": "C:\\Users\\83668\\.nuget\\packages\\",
       "outputPath": "D:\\编译原理\\plzoofs-master\\microc\\obj\\",
       "projectStyle": "PackageReference",
