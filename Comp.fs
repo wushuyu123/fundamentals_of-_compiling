@@ -149,7 +149,7 @@ let makeGlobalEnvs (topdecs: topdec list) : VarEnv * FunEnv * instr list =
     addv topdecs ([], 0) []
 
 
-(*+
+(*
     生成 x86 代码，局部地址偏移 *8 ，因为 x86栈上 8个字节表示一个 堆栈的 slot槽位
     栈式虚拟机 无须考虑，每个栈位保存一个变量
 *)
@@ -254,6 +254,16 @@ and cExpr (e: expr) (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
              | ">" -> [ SWAP; LT ]
              | "<=" -> [ SWAP; LT; NOT ]
              | _ -> raise (Failure "unknown primitive 2"))
+     | Prim3 (e1, e2, e3) ->
+        let labelse = newLabel ()
+        let labend = newLabel ()
+
+        cExpr e1 varEnv funEnv
+        @ [ IFZERO labelse ]
+          @ cExpr e2 varEnv funEnv
+            @ [ GOTO labend ]
+              @ [ Label labelse ]
+                @ cExpr e3 varEnv funEnv @ [ Label labend ]
     | Andalso (e1, e2) ->
         let labend = newLabel ()
         let labfalse = newLabel ()
@@ -277,20 +287,30 @@ and cExpr (e: expr) (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
                 CSTI 1
                 Label labend ]
     | Call (f, es) -> callfun f es varEnv funEnv
-// 编译器增加++--的功能（未完成前无法成功对.c文件编译）
     | SelfOperation (ope,acc) ->
-            match ope with
-            // ++I --I 直接对I的地址的值进行操作
-            // 地址   2  ACE 8  DUP 9  LDI 9   ADD 9  STI 2
-            // 值     5      2      2      5       6      6
-            | "++I" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @ [CSTI 1] @ [ADD] @ [STI]
-            | "--I" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @ [CSTI 1] @ [SUB] @ [STI]
-            // I++ I-- 需要拷贝一份I的值，再对I的地址的值进行操作 
-            // 地址   2  ACE 8 DUP 9  LDI 9  SWAP 8 9  DUP 10 LDI 10 ADD 10 STI 2(10)  INCSP(-1) 去掉9留8
-            // 值     5      2     2      5       5 2      2      5      6      6
-            | "I++" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @[SWAP] @ [DUP] @[LDI] @[CSTI 1] @[ADD] @ [STI] @ [ INCSP(-1) ]
-            | "I--" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @[SWAP] @ [DUP]  @[LDI] @[CSTI 1] @[SUB] @ [STI] @ [ INCSP(-1) ]    
-            | _ -> failwith("unknown primitive " + ope)
+        match ope with
+        // ++I --I 直接对I的地址的值进行操作
+        // 地址   2  ACE 8  DUP 9  LDI 9   ADD 9  STI 2
+        // 值     5      2      2      5       6      6
+        | "++I" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @ [CSTI 1] @ [ADD] @ [STI]
+        | "--I" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @ [CSTI 1] @ [SUB] @ [STI]
+        // I++ I-- 需要拷贝一份I的值，再对I的地址的值进行操作 
+        // 地址   2  ACE 8 DUP 9  LDI 9  SWAP 8 9  DUP 10 LDI 10 ADD 10 STI 2(10)  INCSP(-1) 去掉9留8
+        // 值     5      2     2      5       5 2      2      5      6      6
+        | "I++" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @[SWAP] @ [DUP] @[LDI] @[CSTI 1] @[ADD] @ [STI] @ [ INCSP(-1) ]
+        | "I--" -> cAccess acc varEnv funEnv @ [DUP] @ [LDI] @[SWAP] @ [DUP]  @[LDI] @[CSTI 1] @[SUB] @ [STI] @ [ INCSP(-1) ]
+        | _ -> failwith("unknown primitive " + ope)
+    | ComplexOperation(ope,acc,e) ->
+        // x += 2        
+        let i = cExpr e varEnv funEnv
+        match ope with
+            | "+="  -> cAccess acc varEnv funEnv @ [DUP] @[LDI] @ i  @[ADD] @[STI] 
+            | "-="  -> cAccess acc varEnv funEnv @ [DUP] @[LDI] @ i  @[SUB] @[STI] 
+            | "*="  -> cAccess acc varEnv funEnv @ [DUP] @[LDI] @ i  @[MUL] @[STI] 
+            | "/="  -> cAccess acc varEnv funEnv @ [DUP] @[LDI] @ i  @[DIV] @[STI] 
+            | "%="  -> cAccess acc varEnv funEnv @ [DUP] @[LDI] @ i  @[MOD] @[STI] 
+            | _ -> failwith ("unknown primitive " + ope)
+
 (* Generate code to access variable, dereference pointer or index array.
    The effect of the compiled code is to leave an lvalue on the stack.   *)
 
