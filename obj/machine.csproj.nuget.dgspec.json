@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\正式\\microc\\machine.csproj": {}
+    "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\machine.csproj": {}
   },
   "projects": {
-    "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\正式\\microc\\machine.csproj": {
+    "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\machine.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\正式\\microc\\machine.csproj",
+        "projectUniqueName": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\machine.csproj",
         "projectName": "machine",
-        "projectPath": "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\正式\\microc\\machine.csproj",
-        "packagesPath": "C:\\Users\\ximo\\.nuget\\packages\\",
-        "outputPath": "D:\\work\\HomeWork\\2022.2-6\\编译原理\\大作业\\正式\\microc\\obj\\",
+        "projectPath": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\machine.csproj",
+        "packagesPath": "C:\\Users\\wsy17\\.nuget\\packages\\",
+        "outputPath": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\ximo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\wsy17\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -43,7 +43,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -52,7 +53,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }
