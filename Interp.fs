@@ -342,6 +342,35 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
                 loop store4
             else store2
         loop store2
+
+    | DoWhile (body, e) ->
+        // 先执行一次DO
+        let store1 = exec body locEnv gloEnv store 
+        // 定义 While循环辅助函数 loop
+        let rec loop store2 =
+            // 求值 循环条件,注意变更环境 store
+            let (v, store3) = eval e locEnv gloEnv store2
+            // 继续循环
+            if v <> 0 then
+                loop (exec body locEnv gloEnv store3)
+            else
+                store3 //退出循环返回 环境store3
+        loop(store1)
+
+    | DoUntil (body, e) ->
+        // 先执行一次DO
+        let store1 = exec body locEnv gloEnv store 
+        // 定义 While循环辅助函数 loop
+        let rec loop store2 =
+            // 求值 循环条件,注意变更环境 store
+            let (v, store3) = eval e locEnv gloEnv store2
+        
+            if v <> 0 then
+                store3 //退出循环返回 环境store3
+            // 继续循环
+            else
+                loop (exec body locEnv gloEnv store3)
+        loop(store1)
         
     | Switch (e1,body) ->
         let (v1,store1) = eval e1 locEnv gloEnv store
@@ -400,6 +429,14 @@ and eval e locEnv gloEnv store : int * store =
             | _ -> failwith ("unknown primitive " + ope)
 
         (res, store1)
+    | Print(op,e1)  ->  let (i1, store1) = eval e1 locEnv gloEnv store
+                        let res = 
+                          match op with
+                          | "%c"  -> (printf "%c " (System.BitConverter.ToChar(System.BitConverter.GetBytes(i1),0)); i1)
+                          | "%d"  -> (printf "%d " i1 ; i1) 
+                          | "%f"  -> (printf "%f " (System.BitConverter.ToSingle(System.BitConverter.GetBytes(i1),0)) ;i1)
+                          | "%s"  -> (printf "%s " (string i1) ;i1 )
+                        (res, store1) 
     | Prim2 (ope, e1, e2) ->
         let (i1, store1) = eval e1 locEnv gloEnv store
         let (i2, store2) = eval e2 locEnv gloEnv store1

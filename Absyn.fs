@@ -31,6 +31,7 @@ and expr =                           // 表达式，右值
   | SelfOperation of string * access     
   | ComplexOperation of string * access * expr
   | Prim3 of expr * expr * expr
+  | Print of string * expr           (* Print *)
 
 and access =                         //左值，存储的位置                                            
   | AccVar of string                 (* Variable access        x    *) 
@@ -40,7 +41,8 @@ and access =                         //左值，存储的位置
 and stmt =                                                         
   | If of expr * stmt * stmt         (* Conditional                 *)
   | While of expr * stmt             (* While loop                  *)
-  
+  | DoWhile of stmt * expr 
+  | DoUntil of stmt * expr
   | Expr of expr                     (* Expression statement   e;   *)
   | Return of expr option            (* Return from method          *)
   | Block of stmtordec list          (* Block: grouping and scope   *)
