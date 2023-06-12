@@ -270,26 +270,6 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
 
         loop store
 
-    | Switch (e1,body) ->
-        let (v1,store1) = eval e1 locEnv gloEnv store
-        let rec loop list store1 = 
-            // 遍历case
-            match list with
-            | [] -> store1
-            | Case(e2,body1) :: tail ->
-                let (v2,store2) = eval e2 locEnv gloEnv store1
-                if v1 = v2 then
-                    exec body1 locEnv gloEnv store2
-                else
-                    loop tail store2
-            | Default(body2) :: tail ->
-                let store2 = exec body2 locEnv gloEnv store1
-                loop tail store2
-            | _ -> failwith ("unknown switch stmt") 
-        loop body store1
-    | Case (e,body) -> exec body locEnv gloEnv store
-    | Default(body) -> exec body locEnv gloEnv store
-
     | Expr e ->
         // _ 表示丢弃e的值,返回 变更后的环境store1
         let (_, store1) = eval e locEnv gloEnv store
@@ -347,37 +327,41 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
                 loop store4
             else store2
         loop store2
-    
-    | DoWhile (body, e) ->
-        // 先执行一次DO
-        let store1 = exec body locEnv gloEnv store 
-        // 定义 While循环辅助函数 loop
-        let rec loop store2 =
-            // 求值 循环条件,注意变更环境 store
-            let (v, store3) = eval e locEnv gloEnv store2
-            // 继续循环
-            if v <> 0 then
-                loop (exec body locEnv gloEnv store3)
-            else
-                store3 //退出循环返回 环境store3
-        loop(store1)
+    | ForRangeThree (e1, e2, e3, e4, body) ->
+        let (start,store) = eval e2 locEnv gloEnv store
+        let (last,store) = eval e3 locEnv gloEnv store
+        let (step,store) = eval e4 locEnv gloEnv store
+        let (loc, store1) = access e1 locEnv gloEnv store
+
+        let store2 = setSto store1 loc start
+        let rec loop store2 = 
+            let i = getSto store2 loc
+            if i<last then
+                let store3 = exec body locEnv gloEnv store2
+                let store4 = setSto store3 loc (i+step)
+                loop store4
+            else store2
+        loop store2
         
-    | DoUntil (body, e) ->
-        // 先执行一次DO
-        let store1 = exec body locEnv gloEnv store 
-        // 定义 While循环辅助函数 loop
-        let rec loop store2 =
-            // 求值 循环条件,注意变更环境 store
-            let (v, store3) = eval e locEnv gloEnv store2
-
-            if v <> 0 then
-                store3 //退出循环返回 环境store3
-            // 继续循环
-            else
-                loop (exec body locEnv gloEnv store3)
-        loop(store1)
-
-
+    | Switch (e1,body) ->
+        let (v1,store1) = eval e1 locEnv gloEnv store
+        let rec loop list store1 = 
+            // 遍历case
+            match list with
+            | [] -> store1
+            | Case(e2,body1) :: tail ->
+                let (v2,store2) = eval e2 locEnv gloEnv store1
+                if v1 = v2 then
+                    exec body1 locEnv gloEnv store2
+                else
+                    loop tail store2
+            | Default(body2) :: tail ->
+                let store2 = exec body2 locEnv gloEnv store1
+                loop tail store2
+            | _ -> failwith ("unknown switch stmt") 
+        loop body store1
+    | Case (e,body) -> exec body locEnv gloEnv store
+    | Default(body) -> exec body locEnv gloEnv store
 and stmtordec stmtordec locEnv gloEnv store =
     match stmtordec with
     | Stmt stmt -> (locEnv, exec stmt locEnv gloEnv store)
@@ -410,6 +394,9 @@ and eval e locEnv gloEnv store : int * store =
             | "printc" ->
                 (printf "%c" (char i1)
                  i1)
+            | "printfloat" -> failwith ( string i1)
+
+            //     (printf "%f" (float32 i1))
             | _ -> failwith ("unknown primitive " + ope)
 
         (res, store1)
@@ -433,17 +420,6 @@ and eval e locEnv gloEnv store : int * store =
             | _ -> failwith ("unknown primitive " + ope)
 
         (res, store2)
-    
-    | Print(op,e1)  ->  
-        let (i1, store1) = eval e1 locEnv gloEnv store
-        let res = 
-            match op with
-            | "%c"  -> (printf "%c " (System.BitConverter.ToChar(System.BitConverter.GetBytes(i1),0)); i1)
-            | "%d"  -> (printf "%d " i1 ; i1) 
-            | "%f"  -> (printf "%f " (System.BitConverter.ToSingle(System.BitConverter.GetBytes(i1),0)) ;i1)
-            | "%s"  -> (printf "%s " (string i1) ;i1 )
-        (res, store1)
-    
     | Prim3(e1,e2,e3) ->
         let (v1,store1) = eval e1 locEnv gloEnv store
         let (v2,store2) = eval e2 locEnv gloEnv store1
