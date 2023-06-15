@@ -44,6 +44,7 @@ open Backend
 
 type 'data Env = (string * 'data) list
 
+
 let rec lookup env x =
     match env with
     | [] -> failwith (x + " not found")
@@ -206,6 +207,26 @@ let rec cStmt stmt (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
         @ cStmt body varEnv funEnv
           @ [ Label labtest ]
             @ cExpr e varEnv funEnv @ [ IFZERO labbegin ]
+
+    | Switch (e, stmt1) ->                               
+        let rec cases stmt1 =                            
+            match stmt1 with
+            | Case(e2, stmt2) :: stmts -> 
+                let labend = newLabel () 
+                let labnext = newLabel () 
+                [ DUP ]                                 
+                @cExpr e2 varEnv funEnv           //编译case表达式
+                  @ [ EQ ]                                         //判断switch匹配值和case是否相同
+                    @ [ IFZERO labend ]                             //不相等跳转end
+                      @ cStmt stmt2 varEnv funEnv  //编译case后的执行语句
+                        @ [ GOTO labnext; Label labend ]          
+                          @ cases stmts                             //编译剩下的case
+                            @ [ Label labnext ]
+            | _ -> []                                               //匹配失败
+
+        cExpr e varEnv funEnv                      //编译switch表达式
+        @ cases stmt1
+          @ [ INCSP -1 ]                                              //匹配失败
             
     // for(i=0;i<5;i++)
     | For (e1, e2, e3, body) ->
@@ -217,6 +238,7 @@ let rec cStmt stmt (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
           @ cExpr e3 varEnv funEnv
             @ [ Label labtest ]
               @ cExpr e2 varEnv funEnv @ [ IFNZRO labbegin ]
+
     // for i range(3)
     | ForRangeOne (acc, e1, body) ->
         let labbegin = newLabel ()
@@ -254,6 +276,7 @@ let rec cStmt stmt (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
           @ cExpr plus varEnv funEnv @[INCSP -1]
             @ [ Label labtest ]
               @ cExpr compare varEnv funEnv  @ [ IFNZRO labbegin]
+
     // for i range(3)
     | ForRangeThree (acc, e1, e2, e3, body) ->
         let labbegin = newLabel ()
@@ -272,6 +295,7 @@ let rec cStmt stmt (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
           @ cExpr plus varEnv funEnv @[INCSP -1]
             @ [ Label labtest ]
               @ cExpr compare varEnv funEnv  @ [ IFNZRO labbegin]
+
     | Expr e -> cExpr e varEnv funEnv @ [ INCSP -1 ]
     | Block stmts ->
 
@@ -292,7 +316,7 @@ let rec cStmt stmt (varEnv: VarEnv) (funEnv: FunEnv) : instr list =
 
 and cStmtOrDec stmtOrDec (varEnv: VarEnv) (funEnv: FunEnv) : VarEnv * instr list =
     match stmtOrDec with
-    | Stmt stmt -> (varEnv, cStmt stmt varEnv funEnv)
+    | Stmt stmt -> (varEnv, cStmt stmt varEnv funEnv )
     | Dec (typ, x) -> allocateWithMsg Locvar (typ, x) varEnv
 
 (* Compiling micro-C expressions:

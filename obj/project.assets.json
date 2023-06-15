@@ -238,9 +238,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\interpc.fsproj",
-      "projectName": "interpc",
-      "projectPath": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\interpc.fsproj",
+      "projectUniqueName": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\microc.fsproj",
+      "projectName": "microc",
+      "projectPath": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\microc.fsproj",
       "packagesPath": "C:\\Users\\wsy17\\.nuget\\packages\\",
       "outputPath": "D:\\Work\\bianyiyuanli\\dazuoye\\fundamentals_of_compiling\\obj\\",
       "projectStyle": "PackageReference",

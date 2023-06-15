@@ -33,6 +33,7 @@ type token =
   | TIMESOPE
   | DIVOPE
   | MODOPE
+  | COLON
   | CHAR
   | ELSE
   | IF
@@ -49,7 +50,6 @@ type token =
   | IN
   | RANGE
   | QUEM
-  | COLON
   | SWITCH
   | CASE
   | DEFAULT
@@ -93,6 +93,7 @@ type tokenId =
     | TOKEN_TIMESOPE
     | TOKEN_DIVOPE
     | TOKEN_MODOPE
+    | TOKEN_COLON
     | TOKEN_CHAR
     | TOKEN_ELSE
     | TOKEN_IF
@@ -109,7 +110,6 @@ type tokenId =
     | TOKEN_IN
     | TOKEN_RANGE
     | TOKEN_QUEM
-    | TOKEN_COLON
     | TOKEN_SWITCH
     | TOKEN_CASE
     | TOKEN_DEFAULT
@@ -137,7 +137,6 @@ type nonTerminalId =
     | NONTERM_Stmt
     | NONTERM_StmtM
     | NONTERM_StmtU
-    | NONTERM_StmtS
     | NONTERM_Expr
     | NONTERM_ExprNotAccess
     | NONTERM_AtExprNotAccess
@@ -146,6 +145,7 @@ type nonTerminalId =
     | NONTERM_Exprs1
     | NONTERM_Const
     | NONTERM_ConstFloat
+    | NONTERM_StmtCase
     | NONTERM_Type
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int
