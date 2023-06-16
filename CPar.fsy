@@ -70,7 +70,7 @@ int *p;   // pointer to int   (TypP TypI, "p")
 int ia[10];  // array of 10 ints   (TypA (TypI, Some 10), "ia")
 int* ia2;  // pointer to int   (TypP TypI, "ia2")
 int *ipa[10];  // array of 10 pointers to int   (TypA (TypP TypI, Some 10), "ipa")
-int (*iap)[10];  // pointer to array of 10 int    (TypP (TypA (TypI, Some 10))
+int (*iap)[10];  // pointer to array of 10 int    (TypP (TypA (TypI, Some 10)))
 */
 
 Vardec:                                
